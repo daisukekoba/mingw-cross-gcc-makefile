@@ -27,7 +27,8 @@ BUILD = $(shell cc -dumpmachine)
 
 PATH = $(XPREFIX)/bin:/usr/local/bin:/usr/bin:/bin
 
-CURL = curl
+FETCH = curl -OLJ
+# FETCH = wget
 TAR = tar
 
 GCC_ = gcc-$(GCC_VERSION)
@@ -43,25 +44,25 @@ multi: TARGET = x86_64-w64-mingw32
 32bit 64bit multi: $(GCC_).stamp
 
 $(GCC_).tar.bz2:
-	# $(CURL) -O ftp://gcc.gnu.org/pub/gcc/releases/$(GCC_)/$@
-	$(CURL) -L -O http://ftpmirror.gnu.org/gcc/$(GCC_)/$@
+	# $(FETCH) ftp://gcc.gnu.org/pub/gcc/releases/$(GCC_)/$@
+	$(FETCH) http://ftpmirror.gnu.org/gcc/$(GCC_)/$@
 
 $(BINUTILS_).tar.bz2:
-	# $(CURL) -O ftp://ftp.gnu.org/gnu/binutils/$@
-	$(CURL) -L -O http://ftpmirror.gnu.org/binutils/$@
+	# $(FETCH) ftp://ftp.gnu.org/gnu/binutils/$@
+	$(FETCH) http://ftpmirror.gnu.org/binutils/$@
 
 $(MINGWW64_).tar.gz:
-	$(CURL) -L -J -O http://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/$@/download
+	$(FETCH) http://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/$@/download
 
 $(GMP_).tar.bz2:
-	# $(CURL) -O ftp://ftp.gmplib.org/pub/$(GMP_)/$@
-	$(CURL) -L -O http://ftpmirror.gnu.org/gmp/$@
+	# $(FETCH) ftp://ftp.gmplib.org/pub/$(GMP_)/$@
+	$(FETCH) http://ftpmirror.gnu.org/gmp/$@
 
 $(MPFR_).tar.bz2:
-	$(CURL) -O http://www.mpfr.org/$(MPFR_)/$@
+	$(FETCH) http://www.mpfr.org/$(MPFR_)/$@
 
 $(MPC_).tar.gz:
-	$(CURL) -O http://www.multiprecision.org/mpc/download/$@
+	$(FETCH) http://www.multiprecision.org/mpc/download/$@
 
 .SECONDARY: $(GCC_) $(BINUTILS_) $(MINGWW64_) $(GMP_) $(MPFR_) $(MPC_)
 
@@ -183,4 +184,3 @@ clean:
 	$(RM) *.stamp
 	$(RM) -r *.build
 .PHONY: clean
-
