@@ -14,12 +14,12 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # ----------------------------------------------------------------------------
 
-GCC_VERSION = 4.7.2
-BINUTILS_VERSION = 2.22
-MINGWW64_VERSION = 2.0.7
-GMP_VERSION = 5.0.5
-MPFR_VERSION = 3.1.1
-MPC_VERSION = 1.0.1
+GCC_VERSION = 5.2.0
+BINUTILS_VERSION = 2.25.1
+MINGWW64_VERSION = 4.0.2
+GMP_VERSION = 6.0.0
+MPFR_VERSION = 3.1.3
+MPC_VERSION = 1.0.3
 
 PREFIX = /usr/local
 XPREFIX = $(PREFIX)/$(TARGET)/$(GCC_VERSION)
@@ -51,10 +51,10 @@ $(BINUTILS_).tar.bz2:
 	# $(FETCH) ftp://ftp.gnu.org/gnu/binutils/$@
 	$(FETCH) http://ftpmirror.gnu.org/binutils/$@
 
-$(MINGWW64_).tar.gz:
+$(MINGWW64_).tar.bz2:
 	$(FETCH) http://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/$@/download
 
-$(GMP_).tar.bz2:
+$(GMP_)a.tar.bz2:
 	# $(FETCH) ftp://ftp.gmplib.org/pub/$(GMP_)/$@
 	$(FETCH) http://ftpmirror.gnu.org/gmp/$@
 
@@ -66,7 +66,7 @@ $(MPC_).tar.gz:
 
 .SECONDARY: $(GCC_) $(BINUTILS_) $(MINGWW64_) $(GMP_) $(MPFR_) $(MPC_)
 
-gmp-%: gmp-%.tar.bz2
+gmp-%: gmp-%a.tar.bz2
 	$(TAR) jxf $<
 	touch $@
 
@@ -86,8 +86,8 @@ gcc-%: gcc-%.tar.bz2
 	$(TAR) jxf $<
 	touch $@
 
-mingw-w64-v%: mingw-w64-v%.tar.gz
-	$(TAR) zxf $<
+mingw-w64-v%: mingw-w64-v%.tar.bz2
+	$(TAR) jxf $<
 	touch $@
 
 .SECONDARY: $(GCC_).stamp $(GCC_).core.stamp $(BINUTILS_).stamp \
@@ -135,7 +135,7 @@ binutils-%.stamp: binutils-%
 mingw-w64-v%.headers.stamp: BUILDDIR = mingw-w64-v$*.headers.build
 mingw-w64-v%.headers.stamp: mingw-w64-v%
 	mkdir -p $(BUILDDIR)
-	cd $(BUILDDIR) && ../$</mingw-w64-headers/configure --prefix=$(XPREFIX) --build=$(BUILD) --host=$(TARGET)
+	cd $(BUILDDIR) && ../$</mingw-w64-headers/configure --prefix=$(XPREFIX)/$(TARGET) --build=$(BUILD) --host=$(TARGET)
 	$(MAKE) -C $(BUILDDIR) install
 	cd $(XPREFIX) && [ -d mingw ] || ln -s $(TARGET) mingw
 ifeq ($(MAKECMDGOALS),multi)
@@ -161,7 +161,7 @@ gcc-%.core.stamp: gcc-% $(GMP_).stamp $(MPFR_).stamp $(MPC_).stamp \
 	$(MAKE) -C $(BUILDDIR) install-gcc
 	touch $@
 
-MINGWW64_OPTS = --prefix=$(XPREFIX) --build=$(TARGET) --host=$(TARGET)
+MINGWW64_OPTS = --prefix=$(XPREFIX)/$(TARGET) --host=$(TARGET)
 ifeq ($(MAKECMDGOALS),multi)
 MINGWW64_OPTS += --enable-lib32
 endif
